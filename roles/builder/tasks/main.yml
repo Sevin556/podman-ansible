@@ -1,15 +1,7 @@
 - name: create dockerfile from template
   ansible.builtin.template:
     src: docker_temp.j2
-    dest: "{{ role_path }}/files/Dockerfile"
-
-- name: Copy Dockerfile
-  copy:
-    src: Dockerfile
-    dest: ~/Dockerfile
-    owner: root
-    group: root
-    mode: '0644'
+    dest: "~/Dockerfile"
 
 - name: Copy Index.html
   copy:
@@ -18,6 +10,7 @@
     owner: root
     group: root
     mode: '0644'
+
 #"{{ role_path }}/files"
 - name: Build image from Dockerfile
   docker_image:
@@ -42,8 +35,8 @@
     name: "{{image_name}}"
     state: absent
 
-- name: remove httpd image
+- name: remove centos:8 image
   docker_image:
-    name: httpd
-    tag: '2.4'
+    name: centos
+    tag: '8'
     state: absent

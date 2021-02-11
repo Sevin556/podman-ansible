@@ -1,0 +1,5 @@
+---
+- name: Revert state
+  hosts: all
+  roles:
+    - cleaner
