@@ -1,3 +1,8 @@
+- name: create dockerfile from template
+  ansible.builtin.template:
+    src: docker_temp.j2
+    dest: "{{ role_path }}/files/Dockerfile"
+
 - name: Copy Dockerfile
   copy:
     src: Dockerfile
@@ -13,7 +18,7 @@
     owner: root
     group: root
     mode: '0644'
-
+#"{{ role_path }}/files"
 - name: Build image from Dockerfile
   docker_image:
     build:
@@ -25,7 +30,7 @@
 
 - name: Push image to local repo
   docker_image:
-    name: "{{image_name}}"
+    name: "{{ image_name }}"
     tag: latest
     repository: "localhost:{{ registry_port }}/{{image_name}}"
     push: yes

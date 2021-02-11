@@ -1,0 +1,4 @@
+container_name: webserver
+volume_path: ~/index.html
+volume_dest: /var/www/html
+image_port: 8080
