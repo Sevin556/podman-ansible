@@ -1,6 +1,6 @@
 - name: Start container with webserver
   docker_container:
-    name: {{ container_name }}
+    name: "{{ container_name }}"
     image: "localhost:{{registry_port}}/{{image_name}}"
     state: started
     detach: yes
