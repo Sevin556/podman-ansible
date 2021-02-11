@@ -1,0 +1,44 @@
+- name: Copy Dockerfile
+  copy:
+    src: Dockerfile
+    dest: ~/Dockerfile
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy Index.html
+  copy:
+    src: index.html
+    dest: ~/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Build image from Dockerfile
+  docker_image:
+    build:
+      path: .
+      pull: no
+    state: present
+    source: build
+    name: "{{image_name}}"
+
+- name: Push image to local repo
+  docker_image:
+    name: "{{image_name}}"
+    tag: latest
+    repository: "localhost:{{ registry_port }}/{{image_name}}"
+    push: yes
+    force_tag: yes #to force image pushing into repository
+    source: local
+
+- name: remove old image
+  docker_image:
+    name: "{{image_name}}"
+    state: absent
+
+- name: remove httpd image
+  docker_image:
+    name: httpd
+    tag: '2.4'
+    state: absent

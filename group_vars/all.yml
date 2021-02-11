@@ -1,0 +1,11 @@
+---
+ # retrying config after docker installation
+retry_number: 10
+pause_delay: 10
+
+#registry
+registry_port: 5001
+
+#image
+image_name: my_webserver2
+image_port: 8081
