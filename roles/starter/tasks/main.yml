@@ -1,0 +1,8 @@
+- name: Start container with webserver
+  docker_container:
+    name: web
+    image: "localhost:{{registry_port}}/{{image_name}}"
+    state: started
+    detach: yes
+    ports:
+    - "{{image_port}}:80"
