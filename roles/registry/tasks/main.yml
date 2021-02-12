@@ -1,47 +1,43 @@
-- name: Add repo
-  get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docker-ce.repo
-  become: yes
-
-- name: Install docker
+- name: Install podman
   dnf:
-    name: docker-ce
+    name: podman
     state: latest
-
-- name: Start docker
-  service:
-    name: docker
-    state: started
-    enabled: yes
-  register: result
-  until: result is not failed
-  retries: "{{ retry_number }}"
-  delay: "{{ pause_delay }}"
 
 - name: install pip
   dnf:
     name: python3-pip
     state: latest
 
-- name: install docker for python
-  pip:
-    name: docker
-
 - name: pull repo image
-  docker_image:
+  podman_image:
     name: registry:2.7.1
-    source: pull
 
-- name: start repo
-  docker_container:
+
+- name: create directory
+  file:
+    path: /u01/volumes/registry
+    state: directory
+
+
+- name:  start repo
+  containers.podman.podman_container:
     name: registry
     image: registry:2.7.1
     detach: true
     state: started
+    privileged: yes
     ports:
     - "{{ registry_port }}:5000"
     volumes:
     - /u01/volumes/registry:/var/lib/registry
 
-      
+
+- name: add repo to config
+  lineinfile:
+    path: /etc/containers/registries.conf
+    firstmatch: yes
+    regexp: 'registries = \[\]'
+    insertbefore: "[registries.block]"
+    line: "registries = ['localhost', '127.0.0.1']"
+    state: present
+    backrefs: yes

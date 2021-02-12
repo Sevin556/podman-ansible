@@ -3,40 +3,39 @@
     src: docker_temp.j2
     dest: "~/Dockerfile"
 
+- name: create directory
+  file:
+    path: /var/www/html
+    state: directory
+    
 - name: Copy Index.html
   copy:
     src: index.html
-    dest: ~/index.html
+    dest: /var/www/html/index.html
     owner: root
     group: root
     mode: '0644'
 
 #"{{ role_path }}/files"
 - name: Build image from Dockerfile
-  docker_image:
-    build:
-      path: .
-      pull: no
+  podman_image:
+    path: .
     state: present
-    source: build
     name: "{{image_name}}"
-
-- name: Push image to local repo
-  docker_image:
-    name: "{{ image_name }}"
     tag: latest
-    repository: "localhost:{{ registry_port }}/{{image_name}}"
+    push_args:
+      dest: "localhost:{{ registry_port }}"
     push: yes
-    force_tag: yes #to force image pushing into repository
-    source: local
+    force: yes #to force image pushing into repository
+    validate_certs: no
 
 - name: remove old image
-  docker_image:
+  podman_image:
     name: "{{image_name}}"
     state: absent
 
 - name: remove centos:8 image
-  docker_image:
+  podman_image:
     name: centos
     tag: '8'
     state: absent
