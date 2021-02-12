@@ -1,0 +1,43 @@
+- name: Install podman
+  dnf:
+    name: podman
+    state: latest
+
+- name: install pip
+  dnf:
+    name: python3-pip
+    state: latest
+
+- name: pull repo image
+  podman_image:
+    name: registry:2.7.1
+
+
+- name: create directory
+  file:
+    path: /u01/volumes/registry
+    state: directory
+
+
+- name:  start repo
+  containers.podman.podman_container:
+    name: registry
+    image: registry:2.7.1
+    detach: true
+    state: started
+    privileged: yes
+    ports:
+    - "{{ registry_port }}:5000"
+    volumes:
+    - /u01/volumes/registry:/var/lib/registry
+
+
+- name: add repo to config
+  lineinfile:
+    path: /etc/containers/registries.conf
+    firstmatch: yes
+    regexp: 'registries = \[\]'
+    insertbefore: "[registries.block]"
+    line: "registries = ['localhost', '127.0.0.1']"
+    state: present
+    backrefs: yes

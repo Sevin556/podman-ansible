@@ -1,0 +1,41 @@
+- name: create dockerfile from template
+  ansible.builtin.template:
+    src: docker_temp.j2
+    dest: "~/Dockerfile"
+
+- name: create directory
+  file:
+    path: /var/www/html
+    state: directory
+    
+- name: Copy Index.html
+  copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+#"{{ role_path }}/files"
+- name: Build image from Dockerfile
+  podman_image:
+    path: .
+    state: present
+    name: "{{image_name}}"
+    tag: latest
+    push_args:
+      dest: "localhost:{{ registry_port }}"
+    push: yes
+    force: yes #to force image pushing into repository
+    validate_certs: no
+
+- name: remove old image
+  podman_image:
+    name: "{{image_name}}"
+    state: absent
+
+- name: remove centos:8 image
+  podman_image:
+    name: centos
+    tag: '8'
+    state: absent
