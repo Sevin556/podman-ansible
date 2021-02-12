@@ -1,0 +1,7 @@
+---
+
+#registry
+registry_port: 5000
+
+#image
+image_name: my_webserver2
