@@ -1,28 +1,24 @@
-- name: Uninstall docker
+- name: Remove podman containers
+  shell: "podman rm -af"
+  failed_when: false
+  no_log: True
+  
+- name: Remove podman images
+  shell: "podman rmi -a"
+  failed_when: false
+  no_log: True
+
+- name: Uninstall podman
   dnf:
-    name: docker-ce
+    name: podman
     state: absent
 
-- name: Remove docker files
+- name: Remove configs of podman
   file:
-    path: /var/lib/docker
+    path: /etc/containers
     state: absent
 
-# - name: Remove docker for python
-#   pip: 
-#     name: docker
-#     state: absent
-
-# - name: Remove pip
-#   dnf:
-#     name: python3-pip
-#     state: absent
-
-# - name: Remove registry volumes
-#   file:
-#     path: /u01/volumes/registry
-#     state: absent
-
-
-
-
+- name: Remove podman registry files
+  file:
+    path: /u01/volumes/registry
+    state: absent
