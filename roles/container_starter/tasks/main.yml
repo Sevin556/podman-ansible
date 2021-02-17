@@ -1,0 +1,20 @@
+- name: Start container with webserver
+  containers.podman.podman_container:
+    name: "{{ container_name }}"
+    image: "localhost:{{registry_port}}/{{image_name}}"
+    state: started
+    detach: yes
+    ports:
+    - "{{image_port}}:80"
+    volume:
+    - "{{ volume_path }}:{{ volume_dest }}"
+
+- name: Get website
+  uri: 
+    url: http://127.0.0.1:8080
+    return_content: yes
+  register: response
+
+- name: Print website response
+  debug:
+    var: response
